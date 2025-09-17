@@ -215,7 +215,7 @@ header('Content-Type: text/html');
 
 // Handle API requests from the JavaScript code
 if (isset($_GET['action'])) {
-    header('Content-Type: application/json');
+    header('Content-Type: application/json');
 
     $action = $_GET['action'];
     $answered_count = $_SESSION['answered_count'] ?? 0;
