@@ -220,7 +220,7 @@ if (isset($_GET['action'])) {
     $action = $_GET['action'];
     $answered_count = $_SESSION['answered_count'] ?? 0;
     $total_questions = count($questions);
-
+}
 switch ($action) {
     case 'start':
         $_SESSION['answered_count'] = 0;
@@ -332,7 +332,7 @@ switch ($action) {
             echo json_encode(['status' => 'error', 'message' => 'Could not open log file.']);
         }
         exit;
-    }
+        
 }
 ?>
 <!DOCTYPE html>
