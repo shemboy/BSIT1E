@@ -219,7 +219,7 @@ if (isset($_GET['action'])) {
     
     $action = $_GET['action'];
     $answered_count = $_SESSION['answered_count'] ?? 0;
-    $total_questions = count($questions);
+    $total_questions = count($questions);
 
     switch ($action) {
         case 'start':
