@@ -344,146 +344,146 @@ switch ($action) {
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap');
 
-        body {
-            font-family: 'Poppins', sans-serif;
-            background: linear-gradient(135deg, #f0f4f8, #c1d5e0);
-            color: #333;
-            margin: 0;
-            padding: 1rem;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            min-height: 100vh;
-        }
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #f0f4f8, #c1d5e0);
+            color: #333;
+            margin: 0;
+            padding: 1rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+        }
 
-        h1 {
-            text-align: center;
-            color: #2c3e50;
-            font-size: 2.5rem;
-            margin-bottom: 2rem;
-            text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
-        }
+        h1 {
+            text-align: center;
+            color: #2c3e50;
+            font-size: 2.5rem;
+            margin-bottom: 2rem;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
+        }
 
-        .container {
-            width: 100%;
-            max-width: 600px;
-            background: #ffffff;
-            border-radius: 15px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
-            padding: 2rem;
-            box-sizing: border-box;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-        }
+        .container {
+            width: 100%;
+            max-width: 600px;
+            background: #ffffff;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            padding: 2rem;
+            box-sizing: border-box;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
 
-        #welcomeScreen, #quiz, #timer, #scoreboard {
-            width: 100%;
-        }
+        #welcomeScreen, #quiz, #timer, #scoreboard {
+            width: 100%;
+        }
 
-        #quiz, #timer {
-            display: none;
-        }
+        #quiz, #timer {
+            display: none;
+        }
 
-        p {
-            font-size: 1.1rem;
-            line-height: 1.6;
-        }
+        p {
+            font-size: 1.1rem;
+            line-height: 1.6;
+        }
 
-        button, input[type="text"] {
-            width: 100%;
-            padding: 0.9rem 1.2rem;
-            margin: 0.6rem 0;
-            font-size: 1rem;
-            border: 2px solid #ccc;
-            border-radius: 8px;
-            box-sizing: border-box;
-            transition: all 0.3s ease;
-        }
+        button, input[type="text"] {
+            width: 100%;
+            padding: 0.9rem 1.2rem;
+            margin: 0.6rem 0;
+            font-size: 1rem;
+            border: 2px solid #ccc;
+            border-radius: 8px;
+            box-sizing: border-box;
+            transition: all 0.3s ease;
+        }
 
-        input[type="text"] {
-            border: 2px solid #ddd;
-        }
-        
-        input[type="text"]:focus {
-            outline: none;
-            border-color: #3498db;
-            box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.2);
-        }
+        input[type="text"] {
+            border: 2px solid #ddd;
+        }
+        
+        input[type="text"]:focus {
+            outline: none;
+            border-color: #3498db;
+            box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.2);
+        }
 
-        .primary-btn {
-            background: #3498db;
-            color: white;
-            border: none;
-            font-weight: 600;
-            cursor: pointer;
-            box-shadow: 0 4px 10px rgba(52, 152, 219, 0.3);
-        }
+        .primary-btn {
+            background: #3498db;
+            color: white;
+            border: none;
+            font-weight: 600;
+            cursor: pointer;
+            box-shadow: 0 4px 10px rgba(52, 152, 219, 0.3);
+        }
 
-        .primary-btn:hover {
-            background: #2980b9;
-            transform: translateY(-2px);
-            box-shadow: 0 6px 15px rgba(52, 152, 219, 0.4);
-        }
-        
-        .answer-btn {
-            background: #ecf0f1;
-            color: #2c3e50;
-            font-weight: 400;
-            text-align: left;
-            border: 1px solid #bdc3c7;
-            padding: 0.9rem 1.2rem;
-        }
-        
-        .answer-btn:hover {
-            background: #bdc3c7;
-            transform: none;
-            box-shadow: none;
-        }
+        .primary-btn:hover {
+            background: #2980b9;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(52, 152, 219, 0.4);
+        }
+        
+        .answer-btn {
+            background: #ecf0f1;
+            color: #2c3e50;
+            font-weight: 400;
+            text-align: left;
+            border: 1px solid #bdc3c7;
+            padding: 0.9rem 1.2rem;
+        }
+        
+        .answer-btn:hover {
+            background: #bdc3c7;
+            transform: none;
+            box-shadow: none;
+        }
 
-        .timer, .result, .scoreboard h2 {
-            font-weight: 600;
-            margin-top: 1.5rem;
-            text-align: center;
-        }
+        .timer, .result, .scoreboard h2 {
+            font-weight: 600;
+            margin-top: 1.5rem;
+            text-align: center;
+        }
 
-        .scoreboard h2 {
-            font-size: 1.5rem;
-            color: #2c3e50;
-            margin-top: 2rem;
-            border-bottom: 2px solid #bdc3c7;
-            padding-bottom: 0.5rem;
-        }
-        
-        ul {
-            list-style-type: none;
-            padding: 0;
-            width: 100%;
-        }
+        .scoreboard h2 {
+            font-size: 1.5rem;
+            color: #2c3e50;
+            margin-top: 2rem;
+            border-bottom: 2px solid #bdc3c7;
+            padding-bottom: 0.5rem;
+        }
+        
+        ul {
+            list-style-type: none;
+            padding: 0;
+            width: 100%;
+        }
 
-        ul li {
-            background: #f8f9fa;
-            border: 1px solid #e9ecef;
-            border-radius: 8px;
-            padding: 0.8rem 1rem;
-            margin-bottom: 0.5rem;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-        }
+        ul li {
+            background: #f8f9fa;
+            border: 1px solid #e9ecef;
+            border-radius: 8px;
+            padding: 0.8rem 1rem;
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
 
-        @media (max-width: 600px) {
-            h1 {
-                font-size: 2rem;
-            }
-            .container {
-                padding: 1.5rem;
-                margin-top: 0;
-                box-shadow: none;
-                border-radius: 0;
-            }
-        }
-    </style>
+        @media (max-width: 600px) {
+            h1 {
+                font-size: 2rem;
+            }
+            .container {
+                padding: 1.5rem;
+                margin-top: 0;
+                box-shadow: none;
+                border-radius: 0;
+            }
+        }
+    </style>
 </head>
 <body>
     <h1>🧠 Quiz</h1>
