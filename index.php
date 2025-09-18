@@ -332,6 +332,7 @@ switch ($action) {
             echo json_encode(['status' => 'error', 'message' => 'Could not open log file.']);
         }
         exit;
+    }
 }
 ?>
 <!DOCTYPE html>
