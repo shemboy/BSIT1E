@@ -221,118 +221,117 @@ if (isset($_GET['action'])) {
     $answered_count = $_SESSION['answered_count'] ?? 0;
     $total_questions = count($questions);
 
-    switch ($action) {
-        case 'start':
-            $_SESSION['answered_count'] = 0;
-            $_SESSION['shuffled_questions'] = $questions;
-            shuffle($_SESSION['shuffled_questions']);
-            echo json_encode(['status' => 'ok']);
-            exit;
+switch ($action) {
+    case 'start':
+        $_SESSION['answered_count'] = 0;
+        $_SESSION['shuffled_questions'] = $questions;
+        shuffle($_SESSION['shuffled_questions']);
+        echo json_encode(['status' => 'ok']);
+        exit;
 
-        case 'getQuestion':
-            if ($answered_count >= $total_questions) {
-                echo json_encode(['finished' => true, 'total_questions' => $total_questions]);
-                session_destroy();
-                exit;
-            }
+    case 'getQuestion':
+        if ($answered_count >= $total_questions) {
+            echo json_encode(['finished' => true, 'total_questions' => $total_questions]);
+            session_destroy();
+            exit;
+        }
 
-            $current = $_SESSION['shuffled_questions'][$answered_count];
-            $question_data = [
-                'id' => $current['id'],
-                'type' => $current['type'],
-                'q' => $current['q'],
-                'choices' => $current['choices'] ?? [],
-                'total_questions' => $total_questions
-            ];
-            echo json_encode($question_data);
-            exit;
+        $current = $_SESSION['shuffled_questions'][$answered_count];
+        $question_data = [
+            'id' => $current['id'],
+            'type' => $current['type'],
+            'q' => $current['q'],
+            'choices' => $current['choices'] ?? [],
+            'total_questions' => $total_questions
+        ];
+        echo json_encode($question_data);
+        exit;
 
-        case 'submitAnswer':
-            $data = json_decode(file_get_contents('php://input'), true);
-            $user_answer = $data['user_answer'];
-            $question_id = $data['question_id'];
-            
-            $question = null;
-            foreach ($questions as $q) {
-                if ($q['id'] == $question_id) {
-                    $question = $q;
-                    break;
-                }
-            }
+    case 'submitAnswer':
+        $data = json_decode(file_get_contents('php://input'), true);
+        $user_answer = $data['user_answer'];
+        $question_id = $data['question_id'];
+        
+        $question = null;
+        foreach ($questions as $q) {
+            if ($q['id'] == $question_id) {
+                $question = $q;
+                break;
+            }
+        }
 
-            if ($question) {
-                $correct = false;
-                if ($question['type'] === 'fill') {
-                    $correct = (strtolower($question['answer']) === strtolower($user_answer));
-                } elseif ($question['type'] === 'truefalse') {
-                    $correct = (strtolower($question['answer']) === strtolower($user_answer));
-                } else {
-                    $correct = ($question['answer'] === $user_answer);
-                }
-                
-                $_SESSION['answered_count'] = $answered_count + 1;
-                echo json_encode([
-                    'correct' => $correct,
-                    'correct_answer' => $question['answer']
-                ]);
-            } else {
-                echo json_encode(['error' => 'Question not found.']);
-            }
-            exit;
+        if ($question) {
+            $correct = false;
+            if ($question['type'] === 'fill') {
+                $correct = (strtolower($question['answer']) === strtolower($user_answer));
+            } elseif ($question['type'] === 'truefalse') {
+                $correct = (strtolower($question['answer']) === strtolower($user_answer));
+            } else {
+                $correct = ($question['answer'] === $user_answer);
+            }
+            
+            $_SESSION['answered_count'] = $answered_count + 1;
+            echo json_encode([
+                'correct' => $correct,
+                'correct_answer' => $question['answer']
+            ]);
+        } else {
+            echo json_encode(['error' => 'Question not found.']);
+        }
+        exit;
 
-        case 'saveResult':
-            // This is the action to save the quiz summary results
-            $data = json_decode(file_get_contents('php://input'), true);
-            $name = $data['name'] ?? 'Anonymous';
-            $score = $data['score'] ?? 0;
-            $total = $data['total'] ?? 0;
-            $time = $data['time'] ?? 'N/A';
-            $date = date('Y-m-d H:i:s');
+    case 'saveResult':
+        // This is the action to save the quiz summary results
+        $data = json_decode(file_get_contents('php://input'), true);
+        $name = $data['name'] ?? 'Anonymous';
+        $score = $data['score'] ?? 0;
+        $total = $data['total'] ?? 0;
+        $time = $data['time'] ?? 'N/A';
+        $date = date('Y-m-d H:i:s');
 
-            // Format the result string for the summary log
-            $result_line = "Date: $date | Name: $name | Score: $score/$total | Time: $time\n";
+        // Format the result string for the summary log
+        $result_line = "Date: $date | Name: $name | Score: $score/$total | Time: $time\n";
 
-            // Save the result to a file (quiz_results.txt)
-            $file_path = 'quiz_results.txt';
-            file_put_contents($file_path, $result_line, FILE_APPEND | LOCK_EX);
+        // Save the result to a file (quiz_results.txt)
+        $file_path = 'quiz_results.txt';
+        file_put_contents($file_path, $result_line, FILE_APPEND | LOCK_EX);
 
-            echo json_encode(['status' => 'success', 'message' => 'Summary result saved successfully.']);
-            exit;
+        echo json_encode(['status' => 'success', 'message' => 'Summary result saved successfully.']);
+        exit;
 
-        case 'saveStudentLog':
-            // This is the new action to save the detailed student log
-            $data = json_decode(file_get_contents('php://input'), true);
-            $name = $data['name'] ?? 'Anonymous';
-            $date = date('Y-m-d H:i:s');
-            $incorrectAnswers = $data['incorrectAnswers'] ?? [];
+    case 'saveStudentLog':
+        // This is the new action to save the detailed student log
+        $data = json_decode(file_get_contents('php://input'), true);
+        $name = $data['name'] ?? 'Anonymous';
+        $date = date('Y-m-d H:i:s');
+        $incorrectAnswers = $data['incorrectAnswers'] ?? [];
 
-            // Open the studentlogs.txt file for appending
-            $log_file_path = 'studentlogs.txt';
-            $log_handle = fopen($log_file_path, 'a');
+        // Open the studentlogs.txt file for appending
+        $log_file_path = 'studentlogs.txt';
+        $log_handle = fopen($log_file_path, 'a');
 
-            if ($log_handle) {
-                // Write the header for the log entry
-                fwrite($log_handle, "--- Student Log for $name on $date ---\n");
-                
-                // Log each incorrect answer
-                if (count($incorrectAnswers) > 0) {
-                    foreach ($incorrectAnswers as $q) {
-                        $log_line = "Question ID: {$q['id']} | Question: {$q['q']} | Your Answer: {$q['userAnswer']} | Correct Answer: {$q['correctAnswer']}\n";
-                        fwrite($log_handle, $log_line);
-                    }
-                } else {
-                    fwrite($log_handle, "Student answered all questions correctly.\n");
-                }
-                
-                fwrite($log_handle, "\n"); // Add a blank line for readability
-                fclose($log_handle);
+        if ($log_handle) {
+            // Write the header for the log entry
+            fwrite($log_handle, "--- Student Log for $name on $date ---\n");
+            
+            // Log each incorrect answer
+            if (count($incorrectAnswers) > 0) {
+                foreach ($incorrectAnswers as $q) {
+                    $log_line = "Question ID: {$q['id']} | Question: {$q['q']} | Your Answer: {$q['userAnswer']} | Correct Answer: {$q['correctAnswer']}\n";
+                    fwrite($log_handle, $log_line);
+                }
+            } else {
+                fwrite($log_handle, "Student answered all questions correctly.\n");
+            }
+            
+            fwrite($log_handle, "\n"); // Add a blank line for readability
+            fclose($log_handle);
 
-                echo json_encode(['status' => 'success', 'message' => 'Detailed log saved successfully.']);
-            } else {
-                echo json_encode(['status' => 'error', 'message' => 'Could not open log file.']);
-            }
-            exit;
-    }
+            echo json_encode(['status' => 'success', 'message' => 'Detailed log saved successfully.']);
+        } else {
+            echo json_encode(['status' => 'error', 'message' => 'Could not open log file.']);
+        }
+        exit;
 }
 ?>
 <!DOCTYPE html>
