@@ -341,6 +341,16 @@ switch ($action) {
         $name = $students[$id] ?? '';
         echo json_encode(['name' => $name]);
         exit;
+
+    case 'logTabLeave':
+        $data = json_decode(file_get_contents('php://input'), true);
+        $id = $data['id'] ?? 'UnknownID';
+        $name = $data['name'] ?? 'Anonymous';
+        $date = date('Y-m-d H:i:s');
+        $log_line = "Date: $date | ID: $id | Name: $name | Event: Tab minimized or left\n";
+        file_put_contents('tab_leave_logs.txt', $log_line, FILE_APPEND | LOCK_EX);
+        echo json_encode(['status' => 'logged']);
+        exit;
     }
 }
 ?>
@@ -348,7 +358,7 @@ switch ($action) {
 <html lang="en">
 <head>
     <meta charset="UTF-8" />
-    <title>Mixed-Type Timed Quiz</title>
+    <title>Professor Dualos Academy</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap');
@@ -528,6 +538,7 @@ switch ($action) {
         let currentQuestion = null;
         // New array to store incorrect answers
         let incorrectAnswersLog = []; 
+        let quizStarted = false; // Add this flag
 
         const startBtn = document.getElementById('startBtn');
         const qEl = document.getElementById('question');
@@ -554,22 +565,37 @@ switch ($action) {
             localStorage.setItem('quizScores', JSON.stringify(scores.slice(0, 10)));
         }
 
-        idInput.addEventListener('blur', async () => {
-            const id = idInput.value.trim();
-            if (id !== "") {
-                const res = await fetch(`?action=getStudentName&id=${encodeURIComponent(id)}`);
-                const data = await res.json();
-                if (data.name) {
-                    nameInput.value = data.name;
-                    nameInput.style.display = 'block';
-                } else {
-                    nameInput.value = "ID not found!";
-                    nameInput.style.display = 'block';
-                }
-            } else {
-                nameInput.style.display = 'none';
-            }
-        });
+        // Auto-display name as you type the ID
+idInput.addEventListener('input', async () => {
+    const id = idInput.value.trim();
+    if (id !== "") {
+        const res = await fetch(`?action=getStudentName&id=${encodeURIComponent(id)}`);
+        const data = await res.json();
+        if (data.name) {
+            nameInput.value = data.name;
+            nameInput.style.display = 'block';
+        } else {
+            nameInput.value = "ID not found!";
+            nameInput.style.display = 'block';
+        }
+    } else {
+        nameInput.style.display = 'none';
+    }
+});
+
+// Allow Enter key to start quiz from ID input
+idInput.addEventListener('keydown', function(e) {
+    if (e.key === 'Enter') {
+        startBtn.click();
+    }
+});
+
+// Allow Enter key to start quiz from name input (if you ever make it editable)
+nameInput.addEventListener('keydown', function(e) {
+    if (e.key === 'Enter') {
+        startBtn.click();
+    }
+});
 
         startBtn.addEventListener('click', () => {
             const id = idInput.value.trim();
@@ -592,6 +618,7 @@ switch ($action) {
             incorrectAnswersLog = [];
             quizStartTime = new Date();
             fetch('?action=start').then(() => getNextQuestion());
+            quizStarted = true; // Set flag when quiz starts
         });
 
         async function getNextQuestion() {
@@ -679,6 +706,16 @@ switch ($action) {
                 submitBtn.textContent = "Submit";
                 submitBtn.onclick = () => submitAnswer(input.value.trim());
                 cEl.appendChild(submitBtn);
+
+                // Allow Enter key to submit answer
+                input.addEventListener('keydown', function(e) {
+                    if (e.key === 'Enter') {
+                        submitBtn.click();
+                    }
+                });
+
+                // Autofocus for better UX
+                input.focus();
             }
         }
 
@@ -739,7 +776,36 @@ switch ($action) {
             // Save score to local storage for scoreboard display
             saveScore(score, currentQuestion.total_questions, formattedTime);
             loadScoreboard();
+            quizStarted = false; // Prevent tab leave logging after quiz is done
         }
+
+document.addEventListener('visibilitychange', function() {
+    if (document.visibilityState === 'hidden') {
+        if (quizStarted) { // Only log if quiz has started
+            fetch('?action=logTabLeave', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    id: idInput.value.trim(),
+                    name: nameInput.value.trim()
+                })
+            });
+
+            // Reset quiz state
+            score = 0;
+            currentIndex = 0;
+            incorrectAnswersLog = [];
+            quizEl.style.display = 'none';
+            tEl.style.display = 'none';
+            welcomeScreen.style.display = 'block';
+            rEl.textContent = '';
+            qEl.textContent = '';
+            cEl.innerHTML = '';
+            alert("Quiz stopped because you switched tabs or minimized the browser. Please start again.");
+            quizStarted = false; // Reset flag
+        }
+    }
+});
 
         loadScoreboard();
     </script>
